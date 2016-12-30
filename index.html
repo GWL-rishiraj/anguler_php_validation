@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+
+<link rel="stylesheet" type="text/css" href="style.css">
+
+<body ng-app="formApp">
+    <div ng-controller="formController">
+    <span ng-show="{{userrowdata.emsg}}">{{userrowdata.emsg}}</span>
+    <span ng-show="{{userrowdata.smsg}}">{{userrowdata.smsg}}</span>
+
+	<div  class="main-content">
+  <form name="userForm" class="elegant-aero" novalidate ng-submit="submitForm()" >
+    <label>First Name:</label>
+    <input type="text" name="userFirstName" ng-model="user.firstName" required />
+    <div ng-show="userForm.$submitted || userForm.userFirstName.$touched">
+	    <div ng-show="userForm.userFirstName.$error.required">
+	      <div ng-message="required">This field is required</div>
+	    </div>
+	</div>
+
+    <label>Last Name:</label>
+    <input type="text" name="userLastName" ng-model="user.lastName" required />
+    <div ng-show="userForm.$submitted || userForm.userLastName.$touched">
+    	<div ng-show="userForm.userLastName.$error.required">
+      		<div ng-message="required">This field is required</div>
+    	</div>
+    </div>
+
+    <label>Age:</label>
+    <input type="number" min="10" name="userAge" ng-model="user.age" required integer />
+    <div ng-show="userForm.$submitted || userForm.userAge.$touched">
+    	<div ng-show="userForm.userAge.$error.required">This field is required</div>
+    	<div ng-show="userForm.userAge.$error.integer">Please fill integer field</div>
+    	<div ng-show="userForm.userAge.$error.min">Minimum age should be 10 year</div>
+    </div>
+
+
+    <label>Email Address:</label>
+    <input type="email" name="userEmail" ng-model="user.email" required username />
+    <div ng-show="userForm.$submitted || userForm.userEmail.$touched">
+	    <div ng-show="userForm.userEmail.$error.required || userForm.userEmail.$error.email">
+	      <div ng-show="userForm.userEmail.$error.required">This field is required</div>
+	      <div ng-show="userForm.userEmail.$error.email">Your email address is invalid</div>
+          <span ng-show="userForm.userEmail.$error.username">This email is already taken!</span>
+	    </div>
+    </div>
+
+    <label>Phone Number:</label>
+    <input type="text" name="userPhoneNumber" ng-model="user.phoneNumber" ng-pattern="/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/" required/>
+    <div ng-show="userForm.$submitted || userForm.userPhoneNumber.$touched">
+	    <div ng-show="userForm.userPhoneNumber.$error.required || userForm.userPhoneNumber.$error.pattern">
+	      <div ng-show="userForm.userPhoneNumber.$error.required">This field is required</div>
+	      <div ng-show="userForm.userPhoneNumber.$error.pattern">Must be a valid 10 digit phone number</div>
+	    </div>
+    </div>
+
+    <label>Address:</label>
+    <textarea type="text" name="userAddress" class="form-control" rows="4" ng-model="user.address" ng-minlength="10" ng-maxlength="100" required></textarea>
+    <div ng-show="userForm.$submitted || userForm.userAddress.$touched">
+	      <div ng-show="userForm.userAddress.$error.required">This field is required</div>
+	      <div ng-show="userForm.userAddress.$error.minlength">Address must be over 10 characters</div>
+	      <div ng-show="userForm.userAddress.$error.maxlength">Address must not exceed 100 characters</div>
+	</div>
+
+    <label>Salery:</label>
+    <input type="text" name="userSalary" ng-model="user.salary" required ng-minlength="4"/>
+    <div ng-show="userForm.$submitted || userForm.userSalary.$touched">
+        <div ng-show="userForm.userSalary.$error.required || userForm.userSalary.$error.pattern">
+          <div ng-show="userForm.userSalary.$error.required">This field is required</div>
+          <div ng-show="userForm.userSalary.$error.minlength">Password must be over 4 characters</div>
+        </div>
+    </div>
+
+
+    <label>Password:</label>
+    <input type="password" name="userPassword" ng-model="user.password" ng-minlength="8" required />
+    <div ng-show="userForm.$submitted || userForm.userPassword.$touched">
+      		<div ng-show="userForm.userPassword.$error.required">This field is required</div>
+      		<div ng-show="userForm.userPassword.$error.minlength">Password must be over 8 characters</div>
+    </div>
+
+    <label>Confirm Password:</label>
+    <input type="password" name="userCpassword" ng-model="user.cpassword" required ng-minlength='8' compair-pass="user.password" />
+    <div ng-show="userForm.$submitted || userForm.userCpassword.$touched">
+      		<div ng-show="userForm.userCpassword.$error.required">This field is required</div>
+      		<div ng-show="userForm.userCpassword.$error.compairPass">Fields are not equal!</div>
+    </div>
+    <label>Add user to the system</label>
+    <div><input type="submit" name="userSubmit"  /></div>
+  </form>
+  </div>
+
+<div class="userList">
+    <p> Limit to: <input type="number" step="1" max="10" min="0" ng-model="rows">
+    <table border="1" cellpadding="5px" cellspacing="5px">
+            <tr>
+                <th ng-click="sortthis('name')">Name</th>
+                <th ng-click="sortthis('age')">Age</th>
+                <th ng-click="sortthis('email')" >Email</th>
+                <th >Phone</th>
+                <th ng-click="sortthis('salary')" >Salary($)</th>
+                <th >Address</th>
+                <th>Action</th>
+            </tr>
+            <tr ng-repeat="user in userrowdata.info | limitTo:rows | orderBy:sortColumn:reversSort">
+                <td>{{user.name}}</td>
+                <td>{{user.age}}</td>
+                <td>{{user.email}}</td>
+                <td>{{user.phone}}</td>
+                <td>{{user.salary}}</td>
+                <td>{{user.address}}</td>
+                <td><a href="#{{user.id}}" ng-class="editUser">Edit</a>&nbsp;&nbsp;&nbsp; <a href="#{{user.id}}" ng-class="editUser">Delete</a></td>
+            </tr>
+    </table>
+</div>
+</div>
+ <script type="text/javascript" src="app.js" ></script>
+</body>
+</html>
